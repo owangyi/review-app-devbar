@@ -151,10 +151,12 @@ $backendProjectId = 'your_backend_project_id';
 
 进入 GitLab 项目页面，在项目首页查看 **Project ID**。
 
-## 📚 详细文档
+## 📚 更多文档
 
-- **[架构设计](./ARCHITECTURE.md)** - Cookie 路由原理、Nginx 配置详解、双域名系统
 - **[生命周期](./LIFECYCLE.md)** - 完整的请求流程、分支切换流程、组件交互
+- **[演示指南](./DEMO.md)** - 后端切换演示场景和数据差异说明
+- **[Hosts 配置](./HOSTS.md)** - 本地开发环境的域名映射配置
+- **[API 使用指南](./src/components/DevBar/API_USAGE.md)** - 前端 API 客户端使用方法
 
 ## 🔍 故障排查
 
