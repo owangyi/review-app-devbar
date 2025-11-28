@@ -1,0 +1,105 @@
+.App {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding-bottom: 60px; /* Space for DevBar */
+}
+
+.App-header {
+  padding: 60px 20px;
+  color: white;
+  text-align: center;
+}
+
+.App-header h1 {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+  font-weight: 700;
+}
+
+.App-header p {
+  font-size: 1.2rem;
+  opacity: 0.9;
+  margin-bottom: 2rem;
+}
+
+.demo-content {
+  max-width: 800px;
+  margin: 3rem auto;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 16px;
+  padding: 2rem;
+  text-align: left;
+}
+
+.demo-content h2 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.demo-content ul {
+  list-style: none;
+  padding: 0;
+}
+
+.demo-content li {
+  padding: 0.75rem 0;
+  padding-left: 1.5rem;
+  position: relative;
+}
+
+.demo-content li:before {
+  content: "✓";
+  position: absolute;
+  left: 0;
+  color: #4ade80;
+  font-weight: bold;
+}
+
+/* Compact API Configuration for feature branches */
+.api-config-compact {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 15px;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.api-config-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.api-config-label {
+  opacity: 0.8;
+  font-weight: 500;
+}
+
+.api-config-item code {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 3px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-family: 'Monaco', 'Courier New', monospace;
+}
+
+.api-endpoint {
+  max-width: 300px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+}
+
+.api-config-separator {
+  opacity: 0.5;
+  font-size: 16px;
+}
+

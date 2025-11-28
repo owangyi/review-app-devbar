@@ -1,0 +1,80 @@
+
+
+# 本地开发环境 - 模拟多分支双域名部署
+# 
+# 域名映射 (需要配置 /etc/hosts):
+#   127.0.0.1  develop.discovery.wang
+#   127.0.0.1  develop.api.discovery.wang
+#   127.0.0.1  feature-dev-001-say-hello-world.discovery.wang
+#   127.0.0.1  feature-dev-001-say-hello-world.api.discovery.wang
+#   127.0.0.1  feature-dev-002-update-hello-world.discovery.wang
+#   127.0.0.1  feature-dev-002-update-hello-world.api.discovery.wang
+#   127.0.0.1  discovery.wang
+#
+# 使用方法:
+#   1. 配置 hosts 文件（见上）
+#   2. docker-compose -f docker-compose.dev.yml up -d
+#   3. 访问 http://develop.discovery.wang
+#
+
+services:
+  # Nginx Gateway - 双域名路由
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: devbar-nginx-dev
+    ports:
+      - "80:80"
+    volumes:
+      # 使用新的 review-app.conf（双域名配置）
+      - ./nginx/review-app.conf:/etc/nginx/conf.d/default.conf:ro
+      
+      # 前端分支目录
+      - ./dist:/srv/nginx/pages/develop/public:ro
+      - ./dist:/srv/nginx/pages/feature-dev-001-say-hello-world/public:ro
+      - ./dist:/srv/nginx/pages/feature-dev-002-update-hello-world/public:ro
+      
+      # 后端分支目录（PHP API）
+      - ./public/api:/srv/nginx/pages/develop/api/public:ro
+      - ./public/api:/srv/nginx/pages/feature-dev-001-say-hello-world/api/public:ro
+      - ./public/api:/srv/nginx/pages/feature-dev-002-update-hello-world/api/public:ro
+      
+      # 共享 DevBar API
+      - ./public/dev-ops:/srv/nginx/shared/dev-ops:ro
+      
+      # 日志
+      - nginx-logs:/var/log/nginx
+    depends_on:
+      - php-fpm
+    networks:
+      - devbar-dev
+    restart: unless-stopped
+
+  # PHP-FPM - 用于 DevBar API
+  php-fpm:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: devbar-php-dev
+    volumes:
+      # DevBar API 脚本
+      - ./public/dev-ops:/srv/nginx/shared/dev-ops:ro
+      # 后端 API PHP 文件（需要与 nginx 相同的路径结构）
+      - ./public/api:/srv/nginx/pages/develop/api/public:ro
+      - ./public/api:/srv/nginx/pages/feature-dev-001-say-hello-world/api/public:ro
+      - ./public/api:/srv/nginx/pages/feature-dev-002-update-hello-world/api/public:ro
+    environment:
+      - GITLAB_API_URL=${GITLAB_API_URL:-https://gitlab.com/api/v4}
+      - GITLAB_ACCESS_TOKEN=${GITLAB_ACCESS_TOKEN}
+      - FRONTEND_PROJECT_ID=${FRONTEND_PROJECT_ID}
+      - BACKEND_PROJECT_ID=${BACKEND_PROJECT_ID}
+    networks:
+      - devbar-dev
+    restart: unless-stopped
+
+networks:
+  devbar-dev:
+    driver: bridge
+
+volumes:
+  nginx-logs:
+

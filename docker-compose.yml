@@ -1,0 +1,88 @@
+version: '3.8'
+
+# 生产环境配置 - 双域名系统
+# 
+# 域名要求:
+#   - 前端: *.discovery.wang (如 develop.discovery.wang)
+#   - 后端: *.api.discovery.wang (如 develop.api.discovery.wang)
+#
+# 部署目录结构:
+#   /srv/nginx/pages/
+#   ├── <branch>/
+#   │   ├── public/              # 前端
+#   │   └── api/public/          # 后端
+#   └── shared/dev-ops/          # DevBar API（共享）
+#
+
+services:
+  # Nginx Gateway - 双域名路由
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: review-app-gateway
+    ports:
+      - "80:80"
+      - "443:443"  # HTTPS 支持
+    volumes:
+      # 使用 review-app.conf（双域名配置）
+      - ./nginx/review-app.conf:/etc/nginx/conf.d/default.conf:ro
+      
+      # 挂载部署目录（生产环境应该挂载实际的部署路径）
+      # 示例：每个分支由 CI/CD 部署到各自目录
+      - /srv/nginx/pages:/srv/nginx/pages:ro
+      
+      # 共享 DevBar API
+      - ./public/dev-ops:/srv/nginx/shared/dev-ops:ro
+      
+      # 日志
+      - nginx-logs:/var/log/nginx
+      
+      # SSL 证书（如果使用 HTTPS）
+      # - /etc/letsencrypt:/etc/letsencrypt:ro
+    environment:
+      - GITLAB_API_URL=${GITLAB_API_URL}
+      - GITLAB_ACCESS_TOKEN=${GITLAB_ACCESS_TOKEN}
+      - FRONTEND_PROJECT_ID=${FRONTEND_PROJECT_ID}
+      - BACKEND_PROJECT_ID=${BACKEND_PROJECT_ID}
+    depends_on:
+      - php-fpm
+    networks:
+      - review-app-network
+    restart: unless-stopped
+
+  # PHP-FPM for DevBar API
+  php-fpm:
+    build:
+      context: ./docker/php
+      dockerfile: Dockerfile
+    container_name: review-app-php
+    volumes:
+      # DevBar API 脚本（共享）
+      - ./public/dev-ops:/srv/nginx/shared/dev-ops:ro
+    environment:
+      - GITLAB_API_URL=${GITLAB_API_URL}
+      - GITLAB_ACCESS_TOKEN=${GITLAB_ACCESS_TOKEN}
+      - FRONTEND_PROJECT_ID=${FRONTEND_PROJECT_ID}
+      - BACKEND_PROJECT_ID=${BACKEND_PROJECT_ID}
+    networks:
+      - review-app-network
+    restart: unless-stopped
+
+  # ============================================================
+  # 注意：生产环境中，前后端容器通常由 CI/CD 独立部署
+  # 下面的示例容器仅供参考，实际部署时可能不需要
+  # ============================================================
+  
+  # 如果你的前后端是静态文件（如 React/Vue 构建产物），
+  # 直接通过 Nginx 挂载目录即可，不需要额外容器
+  
+  # 如果你的后端是独立服务（如 Node.js/PHP），
+  # 可以参考下面的示例，或者使用专门的编排工具（如 Kubernetes）
+
+networks:
+  review-app-network:
+    driver: bridge
+
+volumes:
+  nginx-logs:
+  php-cache:
+
