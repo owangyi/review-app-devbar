@@ -6,6 +6,12 @@
 ![React](https://img.shields.io/badge/React-18.2-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-5.0-blue)
 
+## Snapshot
+![DevBar Snapshot 1](./images/branchs.png)
+![DevBar Snapshot 2](./images/backend-001.png)
+![DevBar Snapshot 3](./images/backend-002.png)
+
+
 ## 💡 核心功能
 
 - ✅ 动态切换前后端分支环境
@@ -24,10 +30,6 @@
 
 
 ## 🚀 快速开始
-### Snapshot
-![DevBar Snapshot 1](./images/branchs.png)
-![DevBar Snapshot 2](./images/backend-001.png)
-![DevBar Snapshot 3](./images/backend-002.png)
 
 ### 本地快速体验
 
